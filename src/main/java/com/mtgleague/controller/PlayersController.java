@@ -5,18 +5,18 @@ import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.model.Player;
 import com.mtgleague.service.PlayersService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/players")
+@RequiredArgsConstructor
 public class PlayersController {
 
-    @Autowired
-    private PlayersService playersService;
+    private final PlayersService playersService;
 
     @GetMapping()
     public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayers(){

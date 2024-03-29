@@ -5,18 +5,18 @@ import com.mtgleague.dto.response.EventResponseDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.model.Event;
 import com.mtgleague.service.EventsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/events")
+@RequiredArgsConstructor
 public class EventsController {
 
-    @Autowired
-    private EventsService eventsService;
+    private final EventsService eventsService;
 
     @GetMapping()
     public ResponseEntity<GenericEntityListDTO<EventResponseDTO>> getEvents(){

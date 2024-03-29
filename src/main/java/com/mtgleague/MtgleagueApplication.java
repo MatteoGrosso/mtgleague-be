@@ -1,5 +1,4 @@
 package com.mtgleague;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +14,7 @@ public class MtgleagueApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MtgleagueApplication.class, args);
 	}
+
 	@Bean
 	public CorsFilter corsFilter() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();

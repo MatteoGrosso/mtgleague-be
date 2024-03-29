@@ -5,6 +5,7 @@ import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.model.Player;
 import com.mtgleague.repo.PlayersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import java.util.List;
 public class PlayersService {
     @Autowired
     private PlayersRepository playersRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public List<PlayerResponseDTO> findAll(){
         List<Player> results= playersRepository.findAll();
@@ -29,6 +33,8 @@ public class PlayersService {
     }
 
     private Player toEntity(PlayerRequestDTO playerRequestDTO){
+        playerRequestDTO.setPassword(bCryptPasswordEncoder
+                .encode(playerRequestDTO.getPassword()));
         return new Player(playerRequestDTO.getName(), playerRequestDTO.getSurname(), playerRequestDTO.getEmail(), playerRequestDTO.getPassword());
     }
 
