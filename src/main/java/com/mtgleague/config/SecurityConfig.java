@@ -25,7 +25,8 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST_URL = {
             "/auth/**",
-            "/events"
+            "/events",
+            "/events/{eventId}"
     };
 
     @Bean

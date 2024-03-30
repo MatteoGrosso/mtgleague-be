@@ -36,6 +36,10 @@ public class EventsService {
         return eventsRepository.getReferenceById(id);
     }
 
+    public EventResponseDTO findByIdDTO(Long id){
+        return toDto(findById(id));
+    }
+
     private Event toEntity(EventRequestDTO eventRequestDTO){
         return new Event(eventRequestDTO.getName(), eventRequestDTO.getDate(), eventRequestDTO.getCap(), eventRequestDTO.getDescription());
     }
