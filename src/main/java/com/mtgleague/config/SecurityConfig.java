@@ -12,6 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.mtgleague.model.Role.ADMIN;
+import static org.springframework.http.HttpMethod.*;
+import static com.mtgleague.model.Permission.ADMIN_CREATE;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +36,7 @@ public class SecurityConfig {
                         requests.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
                                 .requestMatchers("/events/new").hasAnyRole(ADMIN.name())
+                                .requestMatchers(POST, "/events/new").hasAnyAuthority(ADMIN_CREATE.name())
                                 .anyRequest()
                                 .authenticated()
                 )

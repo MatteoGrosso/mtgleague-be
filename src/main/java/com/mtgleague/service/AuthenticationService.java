@@ -21,6 +21,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
     public AuthenticationResponse signup(SignupRequest request) {
         var player= Player.builder()
                 .name(request.getName())

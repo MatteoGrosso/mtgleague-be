@@ -1,23 +1,20 @@
 package com.mtgleague.service;
 
-import com.mtgleague.dto.request.PlayerRequestDTO;
 import com.mtgleague.dto.response.PlayerResponseDTO;
+import com.mtgleague.model.Event;
 import com.mtgleague.model.Player;
 import com.mtgleague.repo.PlayersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PlayersService {
-    @Autowired
-    private PlayersRepository playersRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PlayersRepository playersRepository;
 
     public List<PlayerResponseDTO> findAll(){
         List<Player> results= playersRepository.findAll();
@@ -28,14 +25,8 @@ public class PlayersService {
         return dtos;
     }
 
-    public Player addPlayer(PlayerRequestDTO player){
-        return playersRepository.save(toEntity(player));
-    }
-
-    private Player toEntity(PlayerRequestDTO playerRequestDTO){
-        playerRequestDTO.setPassword(bCryptPasswordEncoder
-                .encode(playerRequestDTO.getPassword()));
-        return new Player(playerRequestDTO.getName(), playerRequestDTO.getSurname(), playerRequestDTO.getEmail(), playerRequestDTO.getPassword());
+    public Player findById(Long id){
+        return playersRepository.getReferenceById(id);
     }
 
     private PlayerResponseDTO toDto(Player entity){

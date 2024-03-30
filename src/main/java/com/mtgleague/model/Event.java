@@ -1,14 +1,17 @@
 package com.mtgleague.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 public class Event {
@@ -20,6 +23,7 @@ public class Event {
     private int cap;
     private String description;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "registration",
