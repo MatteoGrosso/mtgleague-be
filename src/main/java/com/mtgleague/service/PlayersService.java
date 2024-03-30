@@ -30,7 +30,7 @@ public class PlayersService {
     }
 
     private PlayerResponseDTO toDto(Player entity){
-        PlayerResponseDTO dto= new PlayerResponseDTO(entity.getId(), entity.getName(), entity.getSurname(), entity.getEmail(), entity.getEvents(), 0, 0, 0.0);
+        PlayerResponseDTO dto= new PlayerResponseDTO(entity.getId(), entity.getName(), entity.getSurname(), entity.getEmail(), entity.getEvents(), entity.getScore(), entity.getWinRate());
         return dto;
     }
 }

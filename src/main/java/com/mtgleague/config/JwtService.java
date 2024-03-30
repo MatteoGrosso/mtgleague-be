@@ -1,5 +1,6 @@
 package com.mtgleague.config;
 
+import com.mtgleague.dto.auth.UtilityAuthDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -41,22 +42,26 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String generateToken(UserDetails userDetails){
+    public UtilityAuthDTO generateToken(UserDetails userDetails){
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(
+    public UtilityAuthDTO generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ){
-        return Jwts
+        long expirationTime = 3600000; // 1 hour in milliseconds
+
+        String jwtToken= Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*60))
+                .setExpiration(new Date(System.currentTimeMillis()+expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+        Long expiredIn= System.currentTimeMillis()+expirationTime;
+        return new UtilityAuthDTO(jwtToken, expiredIn);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){

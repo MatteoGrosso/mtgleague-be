@@ -31,9 +31,11 @@ public class AuthenticationService {
                 .role(Role.USER)
                 .build();
         repository.save(player);
-        var jwtToken = jwtService.generateToken(player);
+        var jwtTokenDTO = jwtService.generateToken(player);
         return AuthenticationResponse.builder()
-                .token(jwtToken)
+                .token(jwtTokenDTO.getToken())
+                .userId(player.getId())
+                .expiresIn(jwtTokenDTO.getExpirationDate())
                 .build();
     }
 
@@ -46,9 +48,11 @@ public class AuthenticationService {
         );
         var player = repository.findByEmail(request.getEmail())
                 .orElseThrow();
-        var jwtToken = jwtService.generateToken(player);
+        var jwtTokenDTO = jwtService.generateToken(player);
         return AuthenticationResponse.builder()
-                .token(jwtToken)
+                .token(jwtTokenDTO.getToken())
+                .userId(player.getId())
+                .expiresIn(jwtTokenDTO.getExpirationDate())
                 .build();
     }
 }

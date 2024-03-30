@@ -27,20 +27,15 @@ public class Player implements UserDetails {
     private String email;
     private String password;
 
+    private int score= 0;
+    private int winRate= 0;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "players")
     private Set<Event> events = new HashSet<>();
-
-
-    public Player(String name, String surname, String email, String password) {
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.password = password;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
