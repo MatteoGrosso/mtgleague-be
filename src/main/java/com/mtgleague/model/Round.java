@@ -26,4 +26,8 @@ public class Round {
 
     private int p1Wins;
     private int p2Wins;
+
+    public Boolean isBye(){
+        return idP2.equals(null);
+    }
 }

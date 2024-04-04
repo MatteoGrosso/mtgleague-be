@@ -37,9 +37,8 @@ public class RoundService {
         roundRepository.save(roundToSave);
     }
 
-    public List<Round> getAllPlayerRounds(Long playerId) throws Exception {
-        return roundRepository.findByPlayerId(playerId)
-                .orElseThrow(() -> new Exception("Rounds not found with playerId: " + playerId));
+    public List<Round> getAllPlayerRounds(Long playerId){
+        return roundRepository.findByPlayerId(playerId);
     }
 
 

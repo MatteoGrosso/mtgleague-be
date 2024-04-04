@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
 
-    @Query("SELECT r FROM Round r WHERE (idp1 = :playerId or idp2 = :playerId) AND started = true")
-    Optional<List<Round>> findByPlayerId(@Param("playerId") Long playerId);
+    @Query("SELECT r FROM Round r WHERE (r.idP1 = :playerId OR r.idP2 = :playerId) AND r.started = true")
+    List<Round> findByPlayerId(@Param("playerId") Long playerId);
 }

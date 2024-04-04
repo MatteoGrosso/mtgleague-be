@@ -96,7 +96,7 @@ public class Pairing {
                             p -> p.getId() == opponentId
                     ).findFirst();
                     if(ps.isPresent()){
-                        omwPlayer.addAndGet( ps.get().getFixedMatchWinRate());
+                        omwPlayer.addAndGet( ps.get().getFixedMatchWinRateWithoutBye());
                     }
                 }
         );
@@ -105,7 +105,7 @@ public class Pairing {
 
     //omw is the value that refers to the winRate (of the single games) of the player
     private int gwCalc(PlayerScore player){
-        return player.getGameWinRate();
+        return player.getGameWinRateWithoutBye();
     }
 
     //omw is the value that refers to the winRate (of the single games) of the opponents / the number of opponents
@@ -118,7 +118,7 @@ public class Pairing {
                             p -> p.getId() == opponentId
                     ).findFirst();
                     if(ps.isPresent()){
-                        ogwPlayer.addAndGet(ps.get().getFixedGameWinRate());
+                        ogwPlayer.addAndGet(ps.get().getFixedGameWinRateWithoutBye());
                     }
                 }
         );
@@ -132,7 +132,7 @@ public class Pairing {
             roundService.createRound(players.get(index).getId(), players.get(++index).getId());
         }
         if(byeIsNeeded){
-            roundService.createRound(players.getLast().getId(), null);
+            roundService.createRound(players.get(players.size()-1).getId(), null);
         }
     }
 
@@ -159,18 +159,28 @@ public class Pairing {
         return playersScores;
     }
 
-    private PlayerScore calculatePastRounds(PlayerScore playerScore) throws Exception {
+    private PlayerScore calculatePastRounds(PlayerScore playerScore){
 
         List<Round> playerRounds=  roundService.getAllPlayerRounds(playerScore.getId());
         Set<Long> opponents= playerScore.getOpponentsIds();
 
         playerRounds.forEach(
                 round -> {
+                    if(!round.isBye()){
+                        playerScore.setMatchPlayedWithoutBye(playerScore.getMatchPlayedWithoutBye()+1);
+                    }
                     playerScore.setMatchPlayed(playerScore.getMatchPlayed()+1);
                     if(round.getIdP1().equals(playerScore.getId())){
                         playerScore.setGameWin(playerScore.getGameWin()+round.getP1Wins());
                         playerScore.setGamePlayed(playerScore.getGamePlayed()+round.getP2Wins()+round.getP1Wins());
+                        if(!round.isBye()){
+                            playerScore.setGameWinWithoutBye(playerScore.getGameWinWithoutBye()+round.getP1Wins());
+                            playerScore.setGamePlayedWithoutBye(playerScore.getGamePlayedWithoutBye()+round.getP2Wins()+round.getP1Wins());
+                        }
                         if(round.getP1Wins() > round.getP2Wins()){
+                            if(!round.isBye()){
+                                playerScore.setMatchWinWithoutBye(playerScore.getMatchWinWithoutBye()+1);
+                            }
                             playerScore.setMatchWin(playerScore.getMatchWin()+1);
                         } else if(round.getP1Wins() == round.getP2Wins()){
                             playerScore.setMatchDraw(playerScore.getMatchDraw()+1);
