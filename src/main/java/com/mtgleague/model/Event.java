@@ -31,6 +31,9 @@ public class Event {
             inverseJoinColumns = @JoinColumn(name = "player_id"))
     private Set<Player> players = new HashSet<>();
 
+    @OneToMany(mappedBy="event")
+    private Set<Round> matches = new HashSet<>();
+
     public Event(String name, Date date, int cap, String description) {
         this.name = name;
         this.date = date;

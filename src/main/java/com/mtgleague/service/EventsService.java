@@ -8,9 +8,7 @@ import com.mtgleague.repo.EventsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,5 +66,12 @@ public class EventsService {
         selectedEvent.setPlayers(filteredPlayers);
 
         return eventsRepository.save(selectedEvent);
+    }
+
+    public List<Player> findAllPlayersPlaying(Long eventId) throws Exception{
+
+        return eventsRepository.findById(eventId)
+                .orElseThrow(() -> new Exception("Event not found with id: " + eventId))
+                .getPlayers().stream().toList();
     }
 }

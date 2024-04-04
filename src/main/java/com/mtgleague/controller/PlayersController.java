@@ -16,10 +16,9 @@ public class PlayersController {
     private final PlayersService playersService;
 
     @GetMapping()
-    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayers(){
+    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayersRanked(){
         GenericEntityListDTO<PlayerResponseDTO> players= new GenericEntityListDTO(playersService.findAll());
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
-
 
 }

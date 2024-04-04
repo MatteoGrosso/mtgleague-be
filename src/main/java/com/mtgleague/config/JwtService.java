@@ -60,8 +60,7 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis()+expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
-        Long expiredIn= new Date(System.currentTimeMillis()+expirationTime).getTime();
-        return new UtilityAuthDTO(jwtToken, expiredIn);
+        return new UtilityAuthDTO(jwtToken, expirationTime);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){

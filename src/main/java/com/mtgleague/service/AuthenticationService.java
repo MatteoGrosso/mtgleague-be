@@ -36,6 +36,7 @@ public class AuthenticationService {
                 .token(jwtTokenDTO.getToken())
                 .userId(player.getId())
                 .expiresIn(jwtTokenDTO.getExpirationDate())
+                .role(player.getRole())
                 .build();
     }
 
@@ -53,6 +54,7 @@ public class AuthenticationService {
                 .token(jwtTokenDTO.getToken())
                 .userId(player.getId())
                 .expiresIn(jwtTokenDTO.getExpirationDate())
+                .role(player.getRole())
                 .build();
     }
 }
