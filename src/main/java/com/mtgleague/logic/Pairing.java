@@ -6,10 +6,7 @@ import com.mtgleague.service.RoundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -20,16 +17,12 @@ public class Pairing {
     private final RoundService roundService;
 
     private void calculatePairings(Long eventId) throws Exception {
-
         List<PlayerScore> activePlayers = calculatePlayersScores(eventId);
 
         // Sort the list of active players based on the actual score + the 3-step rules to break a tie
         quickSort(activePlayers, 0, activePlayers.size() - 1);
 
-        for(PlayerScore player : activePlayers){
-
-        }
-
+        doPairings(activePlayers);
     }
 
     // QuickSort algorithm implementation
@@ -93,7 +86,6 @@ public class Pairing {
 
     //END QuickSort algorithm implementation
 
-
     //omw is the value that refers to the winRate (of the matches) of the opponents / the number of opponents
     //!!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
     private int omwCalc(PlayerScore player, List<PlayerScore> players){
@@ -131,6 +123,17 @@ public class Pairing {
                 }
         );
         return ogwPlayer.get()/player.getOpponentsIds().toArray().length;
+    }
+
+    private void doPairings(List<PlayerScore> players){
+        Boolean byeIsNeeded= players.size()%2 == 1;
+
+        for(int index=0; index < players.size()-1; index++){
+            roundService.createRound(players.get(index).getId(), players.get(++index).getId());
+        }
+        if(byeIsNeeded){
+            roundService.createRound(players.getLast().getId(), null);
+        }
     }
 
     private List<PlayerScore> calculatePlayersScores(Long eventId) throws Exception{

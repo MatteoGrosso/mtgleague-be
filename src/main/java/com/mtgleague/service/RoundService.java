@@ -19,6 +19,15 @@ public class RoundService {
         return roundRepository.getReferenceById(id);
     }
 
+    public Round createRound(Long idPlayer1, Long idPlayer2){
+        return roundRepository.save(
+                Round.builder()
+                        .idP1(idPlayer1)
+                        .idP2(idPlayer2)
+                .build()
+        );
+    }
+
     public void confirmScore(RoundRequestDTO round){
         Round roundToSave= findById(round.getRoundId());
 
