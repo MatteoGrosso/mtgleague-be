@@ -22,6 +22,10 @@ public class PlayerScore {
 
     private Set<Long> opponentsIds;
 
+    public int getScore(){
+        return matchWin * 3 + matchDraw;
+    }
+
     public int getMatchWinRate(){
         int matchWinRate = matchWin/matchPlayed*100;
         return matchWinRate < 33 ? 33 : matchWinRate;

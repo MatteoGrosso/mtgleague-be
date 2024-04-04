@@ -44,9 +44,9 @@ public class Pairing {
     /*
     this partition follows the rules magic the gathering use to do the pairings and the 3-step rules to break a tie:
         1- players points;
-        2- omw (value that corresponds to the winRate (of the matches) of the opponents / the number of opponents)
-        3- gw (value that corresponds to the winRate (of the single games) of the player)
-        4- ogw (value that corresponds to the winRate (of the single games) of the opponents / the number of opponents)
+        2- omw (value that refers to the winRate (of the matches) of the opponents / the number of opponents)
+        3- gw (value that refers to the winRate (of the single games) of the player)
+        4- ogw (value that refers to the winRate (of the single games) of the opponents / the number of opponents)
 
     !!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
      */
@@ -55,10 +55,10 @@ public class Pairing {
         int i = low - 1;
         for (int j = low; j < high; j++) {
             PlayerScore player = players.get(j);
-            if (player.getMatchWinRate() < pivot.getMatchWinRate()) {
+            if (player.getScore() < pivot.getScore()) {
                 i++;
                 swap(players, i, j);
-            }else if(player.getMatchWinRate() == pivot.getMatchWinRate()){
+            }else if(player.getScore() == pivot.getScore()){
                 int omwP= omwCalc(player, players);
                 int omwPivot= omwCalc(pivot, players);
                 if (omwP < omwPivot) {
@@ -94,7 +94,7 @@ public class Pairing {
     //END QuickSort algorithm implementation
 
 
-    //omw is the value that corresponds to the winRate (of the matches) of the opponents / the number of opponents
+    //omw is the value that refers to the winRate (of the matches) of the opponents / the number of opponents
     //!!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
     private int omwCalc(PlayerScore player, List<PlayerScore> players){
         AtomicInteger omwPlayer= new AtomicInteger();
@@ -111,12 +111,12 @@ public class Pairing {
         return omwPlayer.get()/player.getOpponentsIds().toArray().length;
     }
 
-    //omw is the value that corresponds to the winRate (of the single games) of the player
+    //omw is the value that refers to the winRate (of the single games) of the player
     private int gwCalc(PlayerScore player){
         return player.getGameWinRate();
     }
 
-    //omw is the value that corresponds to the winRate (of the single games) of the opponents / the number of opponents
+    //omw is the value that refers to the winRate (of the single games) of the opponents / the number of opponents
     //!!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
     private int ogwCalc(PlayerScore player, List<PlayerScore> players){
         AtomicInteger ogwPlayer= new AtomicInteger();
