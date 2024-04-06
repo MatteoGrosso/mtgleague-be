@@ -2,6 +2,7 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.request.PlayerRequestDTO;
+import com.mtgleague.dto.request.RoundRequestDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.model.Event;
@@ -51,5 +52,11 @@ public class EventsController {
         Player playerToUnsubscribe= playersService.findById(request.getPlayerId());
         Event updatedEvent= eventsService.unsubscribePlayer(eventId, playerToUnsubscribe);
         return new ResponseEntity<>(updatedEvent, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{eventId}/start")
+    public ResponseEntity startEvent(@PathVariable("eventId") Long eventId) throws Exception {
+        eventsService.calculatePairings(eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

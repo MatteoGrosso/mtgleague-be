@@ -15,10 +15,14 @@ public class Round {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean started= false;
-
     private Long idP1;
+    private String nameP1;
+    private String surnameP1;
     private Long idP2;
+    private String nameP2;
+    private String surnameP2;
+
+    private boolean ended; //used to know if this is the current round or not
 
     @ManyToOne
     @JoinColumn(name = "event_id")
@@ -27,7 +31,7 @@ public class Round {
     private int p1Wins;
     private int p2Wins;
 
-    public Boolean isBye(){
-        return idP2.equals(null);
+    public boolean isBye(){
+        return idP2 == null;
     }
 }

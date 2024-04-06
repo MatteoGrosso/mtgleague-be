@@ -2,8 +2,11 @@ package com.mtgleague.service;
 
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
+import com.mtgleague.logic.Pairing;
+import com.mtgleague.logic.PlayerScore;
 import com.mtgleague.model.Event;
 import com.mtgleague.model.Player;
+import com.mtgleague.model.Round;
 import com.mtgleague.repo.EventsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,10 @@ import java.util.stream.Collectors;
 public class EventsService {
 
     private final EventsRepository eventsRepository;
+
+    private final RoundService roundService;
+
+    private final Pairing pairing;
 
     public List<EventResponseDTO> findAll(){
         List<Event> results= eventsRepository.findAll();
@@ -68,10 +75,115 @@ public class EventsService {
         return eventsRepository.save(selectedEvent);
     }
 
-    public List<Player> findAllPlayersPlaying(Long eventId) throws Exception{
+    public void calculatePairings(Long eventId) throws Exception {
+        Event event= findById(eventId);
 
-        return eventsRepository.findById(eventId)
-                .orElseThrow(() -> new Exception("Event not found with id: " + eventId))
-                .getPlayers().stream().toList();
+        if(event.getMaxTurn()==0){
+            event.setMaxTurn(getMaxTurn(event));
+        }
+
+        event.setCurrentTurn(event.getCurrentTurn()+1);
+        calculatePairings(event);
+        event.setStarted(true); //redundant after the first start, but I'll leave it as is
+        eventsRepository.save(event);
+    }
+
+    private int getMaxTurn(Event event){
+        int numberOfParticipants= event.getPlayers().size();
+        return (int) Math.ceil(Math.log(numberOfParticipants) / Math.log(2));
+    }
+
+    private void calculatePairings(Event event) throws Exception {
+        if(event.getCurrentTurn()<event.getMaxTurn()){
+            boolean eventStarted= event.isStarted();
+            List<Player> players = new ArrayList<>(event.getPlayers());
+            Collections.shuffle(players);
+
+            List<PlayerScore> activePlayers = calculatePlayersScores(eventStarted, players);
+            if(eventStarted){
+                // Sort the list of active players based on the actual score + the 3-step rules to break a tie
+                pairing.quickSort(activePlayers, 0, activePlayers.size() - 1);
+            }
+            pairing.doPairings(activePlayers, event, event.getCurrentTurn());
+        }
+    }
+
+    private List<PlayerScore> calculatePlayersScores(boolean started, List<Player> playersToShuffle) throws Exception{
+
+        List<PlayerScore> playersScores= new ArrayList<>();
+
+        List<Player> players = new ArrayList<>(playersToShuffle);
+        Collections.shuffle(players);
+        if(started){
+            players.forEach(
+                    player -> playersScores.add(
+                            calculatePastRounds(
+                                    PlayerScore
+                                            .builder()
+                                            .id(player.getId())
+                                            .name(player.getName()) //im using these in the name/surname for the current round in the fe page. doing that here will save memory
+                                            .surname(player.getSurname())
+                                            .build()
+                            )
+                    )
+            );
+        }else{
+            players.forEach(
+                    player -> playersScores.add(
+                            PlayerScore
+                                    .builder()
+                                    .id(player.getId())
+                                    .name(player.getName()) //im using these in the name/surname for the current round in the fe page. doing that here will save memory
+                                    .surname(player.getSurname())
+                                    .build()
+                    )
+            );
+        }
+        return playersScores;
+    }
+
+    private PlayerScore calculatePastRounds(PlayerScore playerScore){
+
+        List<Round> playerRounds= roundService.getAllPlayerRounds(playerScore.getId());
+        Set<Long> opponents = new HashSet<>();
+
+        playerRounds.forEach(
+                round -> {
+                    if(!round.isBye()){
+                        playerScore.setMatchPlayedWithoutBye(playerScore.getMatchPlayedWithoutBye()+1);
+                    }
+                    playerScore.setMatchPlayed(playerScore.getMatchPlayed()+1);
+                    if(round.getIdP1().equals(playerScore.getId())){
+                        playerScore.setGameWin(playerScore.getGameWin()+round.getP1Wins());
+                        playerScore.setGamePlayed(playerScore.getGamePlayed()+round.getP2Wins()+round.getP1Wins());
+                        if(!round.isBye()){
+                            playerScore.setGameWinWithoutBye(playerScore.getGameWinWithoutBye()+round.getP1Wins());
+                            playerScore.setGamePlayedWithoutBye(playerScore.getGamePlayedWithoutBye()+round.getP2Wins()+round.getP1Wins());
+                        }
+                        if(round.getP1Wins() > round.getP2Wins()){
+                            if(!round.isBye()){
+                                playerScore.setMatchWinWithoutBye(playerScore.getMatchWinWithoutBye()+1);
+                            }
+                            playerScore.setMatchWin(playerScore.getMatchWin()+1);
+                        } else if(round.getP1Wins() == round.getP2Wins()){
+                            playerScore.setMatchDraw(playerScore.getMatchDraw()+1);
+                        }
+                        if(!round.isBye()){
+                            opponents.add(round.getIdP2());
+                        }
+                    } else {
+                        playerScore.setGameWin(playerScore.getGameWin()+round.getP2Wins());
+                        playerScore.setGamePlayed(playerScore.getGamePlayed()+round.getP2Wins()+round.getP1Wins());
+                        if(round.getP2Wins() > round.getP1Wins()){
+                            playerScore.setMatchWin(playerScore.getMatchWin()+1);
+                        }else if(round.getP1Wins() == round.getP2Wins()){
+                            playerScore.setMatchDraw(playerScore.getMatchDraw()+1);
+                        }
+                        opponents.add(round.getIdP1());
+                    }
+                }
+        );
+        playerScore.setOpponentsIds(opponents);
+        return playerScore;
     }
 }

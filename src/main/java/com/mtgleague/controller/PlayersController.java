@@ -1,7 +1,9 @@
 package com.mtgleague.controller;
 
+import com.mtgleague.dto.request.PlayerRequestDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.dto.response.PlayerResponseDTO;
+import com.mtgleague.model.Player;
 import com.mtgleague.service.PlayersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,4 +23,10 @@ public class PlayersController {
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
 
+    @PostMapping("/role")
+    public ResponseEntity<PlayerResponseDTO> getPlayerRole(@RequestBody PlayerRequestDTO playerRequestDTO) {
+        Player player = playersService.findById(playerRequestDTO.getPlayerId());
+        PlayerResponseDTO response= PlayerResponseDTO.builder().role(player.getRole().name()).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

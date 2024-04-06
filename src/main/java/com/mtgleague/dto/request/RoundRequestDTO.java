@@ -15,6 +15,7 @@ import java.util.Date;
 public class RoundRequestDTO {
 
     private Long roundId;
+    private Long playerId;
     private int p1Wins;
     private int p2Wins;
 }

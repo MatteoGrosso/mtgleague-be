@@ -13,6 +13,8 @@ import java.util.Set;
 public class PlayerScore {
 
     private Long id;
+    private String name;
+    private String surname;
 
     private int gameWin;
     private int gameWinWithoutBye;
@@ -36,16 +38,15 @@ public class PlayerScore {
     }
 
     public int getFixedMatchWinRateWithoutBye(){
-        return matchWinWithoutBye/matchPlayedWithoutBye*100;
+        return matchPlayedWithoutBye > 0 ? matchWinWithoutBye/matchPlayedWithoutBye*100 : 0;
     }
 
     public int getGameWinRateWithoutBye(){
-        return gameWinWithoutBye/gamePlayedWithoutBye*100;
+        return gamePlayedWithoutBye > 0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
     }
 
     public int getFixedGameWinRateWithoutBye(){
-        int gameWinRate = gameWinWithoutBye/gamePlayedWithoutBye*100;
+        int gameWinRate = gamePlayedWithoutBye>0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
         return gameWinRate < 33 ? 33 : gameWinRate;
     }
-
 }

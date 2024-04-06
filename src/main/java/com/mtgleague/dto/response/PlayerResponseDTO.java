@@ -1,10 +1,7 @@
 package com.mtgleague.dto.response;
 
 import com.mtgleague.model.Event;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -12,6 +9,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class PlayerResponseDTO {
 
     private Long id;
@@ -21,4 +19,5 @@ public class PlayerResponseDTO {
     private Set<Event> events;
     private int score;
     private int winRate;
+    private String role;
 }

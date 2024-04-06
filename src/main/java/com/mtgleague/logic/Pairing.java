@@ -1,32 +1,21 @@
 package com.mtgleague.logic;
 
-import com.mtgleague.model.Round;
-import com.mtgleague.service.EventsService;
+import com.mtgleague.model.Event;
 import com.mtgleague.service.RoundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
 public class Pairing {
-
-    private final EventsService eventsService;
     private final RoundService roundService;
 
-    private void calculatePairings(Long eventId) throws Exception {
-        List<PlayerScore> activePlayers = calculatePlayersScores(eventId);
-
-        // Sort the list of active players based on the actual score + the 3-step rules to break a tie
-        quickSort(activePlayers, 0, activePlayers.size() - 1);
-
-        doPairings(activePlayers);
-    }
-
     // QuickSort algorithm implementation
-    private void quickSort(List<PlayerScore> players, int low, int high) {
+    public void quickSort(List<PlayerScore> players, int low, int high) {
         if (low < high) {
             int pi = partition(players, low, high);
             quickSort(players, low, pi - 1);
@@ -100,7 +89,8 @@ public class Pairing {
                     }
                 }
         );
-        return omwPlayer.get()/player.getOpponentsIds().toArray().length;
+        int numberOfOpponents= player.getOpponentsIds().size();
+        return numberOfOpponents>0 ? omwPlayer.get()/numberOfOpponents : 0;
     }
 
     //omw is the value that refers to the winRate (of the single games) of the player
@@ -122,84 +112,46 @@ public class Pairing {
                     }
                 }
         );
-        return ogwPlayer.get()/player.getOpponentsIds().toArray().length;
+        int numberOfOpponents= player.getOpponentsIds().size();
+        return numberOfOpponents>0 ? ogwPlayer.get()/numberOfOpponents : 0;
     }
 
-    private void doPairings(List<PlayerScore> players){
+    public void doPairings(List<PlayerScore> players, Event event, int currentTurn){
         Boolean byeIsNeeded= players.size()%2 == 1;
 
-        for(int index=0; index < players.size()-1; index++){
-            roundService.createRound(players.get(index).getId(), players.get(++index).getId());
+        List<PlayerScore> notYetPaired= players;
+
+        if (!event.isStarted()) {
+            for (int index = 0; index < players.size() - 1; index++) {
+                PlayerScore player1= players.get(index);
+                PlayerScore player2= players.get(++index);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event,false);
+            }
+            if (byeIsNeeded){
+                PlayerScore player1= players.get(players.size()-1);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, true);
+            }
+        } else {
+            do {
+                PlayerScore player1= notYetPaired.get(notYetPaired.size()-1);
+
+                List<PlayerScore> possibleOpponents= notYetPaired.stream()
+                        .filter(
+                                p -> p.getId() != player1.getId() && !player1.getOpponentsIds().contains(p.getId()))
+                        .collect(Collectors.toList());
+
+                PlayerScore player2 = possibleOpponents.get(possibleOpponents.size() - 1);
+
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event,false);
+
+                notYetPaired.remove(player1);
+                notYetPaired.remove(player2);
+            } while(notYetPaired.size() > 1);
+            if (byeIsNeeded){
+                PlayerScore player1= notYetPaired.get(notYetPaired.size()-1);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, true);
+            }
         }
-        if(byeIsNeeded){
-            roundService.createRound(players.get(players.size()-1).getId(), null);
-        }
+
     }
-
-    private List<PlayerScore> calculatePlayersScores(Long eventId) throws Exception{
-
-        List<PlayerScore> playersScores= new ArrayList<>();
-
-        eventsService.findAllPlayersPlaying(eventId).forEach(
-                player -> {
-                    try {
-                        playersScores.add(
-                                calculatePastRounds(
-                                        PlayerScore
-                                                .builder()
-                                                .id(player.getId())
-                                                .build()
-                                )
-                        );
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
-        return playersScores;
-    }
-
-    private PlayerScore calculatePastRounds(PlayerScore playerScore){
-
-        List<Round> playerRounds=  roundService.getAllPlayerRounds(playerScore.getId());
-        Set<Long> opponents= playerScore.getOpponentsIds();
-
-        playerRounds.forEach(
-                round -> {
-                    if(!round.isBye()){
-                        playerScore.setMatchPlayedWithoutBye(playerScore.getMatchPlayedWithoutBye()+1);
-                    }
-                    playerScore.setMatchPlayed(playerScore.getMatchPlayed()+1);
-                    if(round.getIdP1().equals(playerScore.getId())){
-                        playerScore.setGameWin(playerScore.getGameWin()+round.getP1Wins());
-                        playerScore.setGamePlayed(playerScore.getGamePlayed()+round.getP2Wins()+round.getP1Wins());
-                        if(!round.isBye()){
-                            playerScore.setGameWinWithoutBye(playerScore.getGameWinWithoutBye()+round.getP1Wins());
-                            playerScore.setGamePlayedWithoutBye(playerScore.getGamePlayedWithoutBye()+round.getP2Wins()+round.getP1Wins());
-                        }
-                        if(round.getP1Wins() > round.getP2Wins()){
-                            if(!round.isBye()){
-                                playerScore.setMatchWinWithoutBye(playerScore.getMatchWinWithoutBye()+1);
-                            }
-                            playerScore.setMatchWin(playerScore.getMatchWin()+1);
-                        } else if(round.getP1Wins() == round.getP2Wins()){
-                            playerScore.setMatchDraw(playerScore.getMatchDraw()+1);
-                        }
-                        opponents.add(round.getIdP2());
-                    } else {
-                        playerScore.setGameWin(playerScore.getGameWin()+round.getP2Wins());
-                        playerScore.setGamePlayed(playerScore.getGamePlayed()+round.getP2Wins()+round.getP1Wins());
-                        if(round.getP2Wins() > round.getP1Wins()){
-                            playerScore.setMatchWin(playerScore.getMatchWin()+1);
-                        }else if(round.getP1Wins() == round.getP2Wins()){
-                            playerScore.setMatchDraw(playerScore.getMatchDraw()+1);
-                        }
-                        opponents.add(round.getIdP1());
-                    }
-                }
-        );
-        playerScore.setOpponentsIds(opponents);
-        return playerScore;
-    }
-
 }

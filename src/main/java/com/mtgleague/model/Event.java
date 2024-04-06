@@ -19,9 +19,15 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    private boolean started;
     private Date date;
     private int cap;
     private String description;
+
+    private int currentTurn;
+
+    private int maxTurn;
 
     @JsonIgnore
     @ManyToMany

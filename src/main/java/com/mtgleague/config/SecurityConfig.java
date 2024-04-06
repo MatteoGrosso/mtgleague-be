@@ -29,6 +29,11 @@ public class SecurityConfig {
             "/events/{eventId}"
     };
 
+    private static final String[] ADMIN_URL = {
+            "/events/new",
+            "events/{eventId}/start"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -36,8 +41,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) ->
                         requests.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
-                                .requestMatchers("/events/new").hasAnyRole(ADMIN.name())
-                                .requestMatchers(POST, "/events/new").hasAnyAuthority(ADMIN_CREATE.name())
+                                .requestMatchers(ADMIN_URL).hasAnyRole(ADMIN.name())
+                                .requestMatchers(POST, ADMIN_URL).hasAnyAuthority(ADMIN_CREATE.name())
                                 .anyRequest()
                                 .authenticated()
                 )
