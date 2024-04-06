@@ -2,7 +2,6 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.RoundRequestDTO;
 import com.mtgleague.dto.response.RoundResponseDTO;
-import com.mtgleague.model.Round;
 import com.mtgleague.service.EventsService;
 import com.mtgleague.service.RoundService;
 import lombok.RequiredArgsConstructor;

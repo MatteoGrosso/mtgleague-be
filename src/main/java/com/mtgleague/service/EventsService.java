@@ -50,7 +50,7 @@ public class EventsService {
     }
 
     private EventResponseDTO toDto(Event entity){
-        return new EventResponseDTO(entity.getId(), entity.getName(), entity.getDate(), entity.getCap(), entity.getDescription(), entity.getPlayers());
+        return new EventResponseDTO(entity.getId(), entity.getName(), entity.getDate(), entity.getCap(), entity.getDescription(), entity.isStarted(), entity.getPlayers());
     }
 
     public Event registerPlayer(Long eventId, Player playerToSubscribe) {

@@ -20,5 +20,6 @@ public class EventResponseDTO {
     private Date date;
     private int cap;
     private String description;
+    private boolean started;
     private Set<Player> players;
 }

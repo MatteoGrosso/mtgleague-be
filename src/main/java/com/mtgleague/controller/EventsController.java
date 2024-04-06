@@ -2,7 +2,6 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.request.PlayerRequestDTO;
-import com.mtgleague.dto.request.RoundRequestDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.model.Event;
