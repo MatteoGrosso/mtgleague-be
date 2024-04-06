@@ -2,6 +2,7 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.RoundRequestDTO;
 import com.mtgleague.dto.response.RoundResponseDTO;
+import com.mtgleague.model.Round;
 import com.mtgleague.service.EventsService;
 import com.mtgleague.service.RoundService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,8 @@ public class RoundController {
     }
 
     @PostMapping("/current")
-    public ResponseEntity<RoundResponseDTO> getCurrentRound(@RequestBody RoundRequestDTO request){
-        RoundResponseDTO currentRound= roundService.getCurrentRound(request.getPlayerId());
+    public ResponseEntity<Round> getCurrentRound(@RequestBody RoundRequestDTO request){
+        Round currentRound= roundService.getCurrentRound(request.getPlayerId());
         return new ResponseEntity<>(currentRound, HttpStatus.OK);
     }
 }

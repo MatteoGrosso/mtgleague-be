@@ -125,11 +125,11 @@ public class Pairing {
             for (int index = 0; index < players.size() - 1; index++) {
                 PlayerScore player1= players.get(index);
                 PlayerScore player2= players.get(++index);
-                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event,false);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event, currentTurn, false);
             }
             if (byeIsNeeded){
                 PlayerScore player1= players.get(players.size()-1);
-                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, true);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, currentTurn, true);
             }
         } else {
             do {
@@ -142,14 +142,14 @@ public class Pairing {
 
                 PlayerScore player2 = possibleOpponents.get(possibleOpponents.size() - 1);
 
-                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event,false);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), player2.getId(), player2.getName(), player2.getSurname(),0,0, event, currentTurn,false);
 
                 notYetPaired.remove(player1);
                 notYetPaired.remove(player2);
             } while(notYetPaired.size() > 1);
             if (byeIsNeeded){
                 PlayerScore player1= notYetPaired.get(notYetPaired.size()-1);
-                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, true);
+                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, currentTurn, true);
             }
         }
 

@@ -22,7 +22,7 @@ public class RoundService {
         return roundRepository.getReferenceById(id);
     }
 
-    public Round createRound(Long idPlayer1, String nameP1, String surnameP1, Long idPlayer2, String nameP2, String surnameP2, int p1wins, int p2Wins, Event event, boolean ended){
+    public Round createRound(Long idPlayer1, String nameP1, String surnameP1, Long idPlayer2, String nameP2, String surnameP2, int p1wins, int p2Wins, Event event, int turn, boolean ended){
         return roundRepository.save(
                 Round.builder()
                         .idP1(idPlayer1)
@@ -34,6 +34,7 @@ public class RoundService {
                         .p1Wins(p1wins)
                         .p2Wins(p2Wins)
                         .event(event)
+                        .turn(turn)
                         .ended(ended)
                 .build()
         );
@@ -57,30 +58,13 @@ public class RoundService {
         return currentRounds.size()==0;
     }
 
-    public RoundResponseDTO getCurrentRound(Long playerId){
+    public Round getCurrentRound(Long playerId){
         Optional<Round> currentRound= roundRepository.findCurrentByPlayerId(playerId);
-        if(currentRound.isPresent()){
-            return toResponseDto(currentRound.get());
-        }
-        //ritorna nell'oggetto una valiabile "BYE"
-        return null;
+        return currentRound.get();
     }
 
     public List<Round> getAllPlayerRounds(Long playerId){
         return roundRepository.findByPlayerId(playerId);
-    }
-
-    private RoundResponseDTO toResponseDto(Round entity){
-        return RoundResponseDTO.builder()
-                .id(entity.getId())
-                .idP1(entity.getIdP1())
-                .nameP1(entity.getNameP1())
-                .surnameP1(entity.getSurnameP1())
-                .idP2(entity.getIdP2())
-                .nameP2(entity.getNameP2())
-                .surnameP2(entity.getSurnameP2())
-                .ended(entity.isEnded())
-                .build();
     }
 
 }

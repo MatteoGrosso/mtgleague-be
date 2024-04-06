@@ -1,5 +1,6 @@
 package com.mtgleague.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,11 @@ public class Round {
     private Long idP2;
     private String nameP2;
     private String surnameP2;
+    private int turn;
 
     private boolean ended; //used to know if this is the current round or not
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
