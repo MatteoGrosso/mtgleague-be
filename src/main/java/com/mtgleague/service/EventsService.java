@@ -110,15 +110,15 @@ public class EventsService {
         }
     }
 
-    //public because i'm using it in PlayersService for the rankList
+    //public because I'm using it in PlayersService for the rankList
     public List<PlayerScore> calculatePlayersScores(boolean started, List<Player> players) throws Exception{
 
         List<PlayerScore> playersScores= new ArrayList<>();
 
-        List<Player> playersShouffled = new ArrayList<>(players);
-        Collections.shuffle(playersShouffled);
+        List<Player> playersShuffled = new ArrayList<>(players);
+        Collections.shuffle(playersShuffled);
         if(started){
-            playersShouffled.forEach(
+            playersShuffled.forEach(
                     player -> playersScores.add(
                             calculatePastRounds(
                                     PlayerScore
@@ -131,7 +131,7 @@ public class EventsService {
                     )
             );
         }else{
-            playersShouffled.forEach(
+            playersShuffled.forEach(
                     player -> playersScores.add(
                             PlayerScore
                                     .builder()

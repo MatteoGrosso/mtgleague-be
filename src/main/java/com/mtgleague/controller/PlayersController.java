@@ -19,8 +19,8 @@ public class PlayersController {
     private final PlayersService playersService;
 
     @GetMapping()
-    public ResponseEntity<GenericEntityListDTO<PlayerScore>> getPlayersRanked() throws Exception {
-        GenericEntityListDTO<PlayerScore> players= new GenericEntityListDTO(playersService.findAll());
+    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayersRanked() throws Exception {
+        GenericEntityListDTO<PlayerResponseDTO> players= new GenericEntityListDTO(playersService.findAll());
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
 

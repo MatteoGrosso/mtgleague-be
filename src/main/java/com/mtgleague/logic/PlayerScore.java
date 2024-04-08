@@ -34,21 +34,24 @@ public class PlayerScore {
         return matchWin * 3 + matchDraw;
     }
 
-    public int getMatchWinRate(){
-        return matchWin/matchPlayed*100;
+    public double getMatchWinRate(){
+        double matchWinRate= ((double)matchWin/(double)matchPlayed)*100;
+        return Double.parseDouble(String.format("%.2f", matchWinRate));
+
     }
 
-    public int getFixedMatchWinRateWithoutBye(){
-        int matchWinRate = matchPlayedWithoutBye > 0 ? matchWinWithoutBye/matchPlayedWithoutBye*100 : 0;
-        return matchWinRate < 33 ? 33 : matchWinRate;
+    public double getFixedMatchWinRateWithoutBye(){
+        double matchWinRate = matchPlayedWithoutBye > 0 ? matchWinWithoutBye/matchPlayedWithoutBye*100 : 0;
+        return matchWinRate < 33 ? 33 : Double.parseDouble(String.format("%.2f", matchWinRate));
     }
 
-    public int getGameWinRateWithoutBye(){
-        return gamePlayedWithoutBye > 0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
+    public double getGameWinRateWithoutBye(){
+        double gameWinRate = gamePlayedWithoutBye > 0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
+        return gameWinRate;
     }
 
-    public int getFixedGameWinRateWithoutBye(){
-        int gameWinRate = gamePlayedWithoutBye>0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
-        return gameWinRate < 33 ? 33 : gameWinRate;
+    public double getFixedGameWinRateWithoutBye(){
+        double gameWinRate = gamePlayedWithoutBye>0 ? gameWinWithoutBye/gamePlayedWithoutBye*100 : 0;
+        return gameWinRate < 33 ? 33 : Double.parseDouble(String.format("%.2f", gameWinRate));
     }
 }

@@ -12,11 +12,10 @@ import java.util.Set;
 @Builder
 public class PlayerResponseDTO {
 
-    private Long id;
     private String name;
     private String surname;
     private String role;
-    private int matchWinRate;
+    private double matchWinRate;
     private int score;
     private int eventsPlayed;
 }

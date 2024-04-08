@@ -1,12 +1,12 @@
 package com.mtgleague.logic;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.mtgleague.model.Event;
 import com.mtgleague.service.RoundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -37,25 +37,25 @@ public class Pairing {
         int i = low - 1;
         for (int j = low; j < high; j++) {
             PlayerScore player = players.get(j);
-            if (player.getScore() < pivot.getScore()) {
+            if (player.getScore() > pivot.getScore()) {
                 i++;
                 swap(players, i, j);
             }else if(player.getScore() == pivot.getScore()){
-                int omwP= omwCalc(player, players);
-                int omwPivot= omwCalc(pivot, players);
-                if (omwP < omwPivot) {
+                double omwP= omwCalc(player, players);
+                double omwPivot= omwCalc(pivot, players);
+                if (omwP > omwPivot) {
                     i++;
                     swap(players, i, j);
                 }else if(omwP == omwPivot){
-                    int gwP= gwCalc(player);
-                    int gwPivot= gwCalc(pivot);
-                    if (gwP < gwPivot) {
+                    double gwP= gwCalc(player);
+                    double gwPivot= gwCalc(pivot);
+                    if (gwP > gwPivot) {
                         i++;
                         swap(players, i, j);
                     }else if(gwP == gwPivot){
-                        int ogwP= ogwCalc(player, players);
-                        int ogwPivot= ogwCalc(pivot, players);
-                        if (ogwP < ogwPivot) {
+                        double ogwP= ogwCalc(player, players);
+                        double ogwPivot= ogwCalc(pivot, players);
+                        if (ogwP > ogwPivot) {
                             i++;
                             swap(players, i, j);
                         }
@@ -77,8 +77,8 @@ public class Pairing {
 
     //omw is the value that refers to the winRate (of the matches) of the opponents / the number of opponents
     //!!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
-    private int omwCalc(PlayerScore player, List<PlayerScore> players){
-        AtomicInteger omwPlayer= new AtomicInteger();
+    private double omwCalc(PlayerScore player, List<PlayerScore> players){
+        AtomicDouble omwPlayer= new AtomicDouble();
         player.getOpponentsIds().forEach(
                 opponentId -> {
                     Optional<PlayerScore> ps= players.stream().filter(
@@ -94,14 +94,14 @@ public class Pairing {
     }
 
     //omw is the value that refers to the winRate (of the single games) of the player
-    private int gwCalc(PlayerScore player){
+    private double gwCalc(PlayerScore player){
         return player.getGameWinRateWithoutBye();
     }
 
     //omw is the value that refers to the winRate (of the single games) of the opponents / the number of opponents
     //!!!Be careful: magic the gathering uses this rules "when calculating omw and ogw, the single winRates are set to 33 if they are below"!!!
-    private int ogwCalc(PlayerScore player, List<PlayerScore> players){
-        AtomicInteger ogwPlayer= new AtomicInteger();
+    private double ogwCalc(PlayerScore player, List<PlayerScore> players){
+        AtomicDouble ogwPlayer= new AtomicDouble();
         player.getOpponentsIds().forEach(
                 opponentId -> {
                     Optional<PlayerScore> ps= players.stream().filter(
