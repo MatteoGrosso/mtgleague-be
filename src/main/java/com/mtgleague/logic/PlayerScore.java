@@ -28,17 +28,19 @@ public class PlayerScore {
 
     private Set<Long> opponentsIds;
 
+    private int eventsPlayed; //used only in the players service for the rankList
+
     public int getScore(){
         return matchWin * 3 + matchDraw;
     }
 
     public int getMatchWinRate(){
-        int matchWinRate = matchWin/matchPlayed*100;
-        return matchWinRate < 33 ? 33 : matchWinRate;
+        return matchWin/matchPlayed*100;
     }
 
     public int getFixedMatchWinRateWithoutBye(){
-        return matchPlayedWithoutBye > 0 ? matchWinWithoutBye/matchPlayedWithoutBye*100 : 0;
+        int matchWinRate = matchPlayedWithoutBye > 0 ? matchWinWithoutBye/matchPlayedWithoutBye*100 : 0;
+        return matchWinRate < 33 ? 33 : matchWinRate;
     }
 
     public int getGameWinRateWithoutBye(){

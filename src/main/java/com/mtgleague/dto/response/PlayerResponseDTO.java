@@ -15,9 +15,8 @@ public class PlayerResponseDTO {
     private Long id;
     private String name;
     private String surname;
-    private String email;
-    private Set<Event> events;
-    private int score;
-    private int winRate;
     private String role;
+    private int matchWinRate;
+    private int score;
+    private int eventsPlayed;
 }

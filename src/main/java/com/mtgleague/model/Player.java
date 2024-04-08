@@ -25,9 +25,6 @@ public class Player implements UserDetails {
     private String email;
     private String password;
 
-    private int score= 0;
-    private int winRate= 0;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 

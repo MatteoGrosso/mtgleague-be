@@ -56,10 +56,12 @@ public class EventsService {
     public Event registerPlayer(Long eventId, Player playerToSubscribe) {
         Event selectedEvent= findById(eventId);
         Set<Player> playersSubscribed= selectedEvent.getPlayers();
-        playersSubscribed.add(playerToSubscribe);
-        selectedEvent.setPlayers(playersSubscribed);
-
-        return eventsRepository.save(selectedEvent);
+        if(playersSubscribed.size()<selectedEvent.getCap()){
+            playersSubscribed.add(playerToSubscribe);
+            selectedEvent.setPlayers(playersSubscribed);
+            return eventsRepository.save(selectedEvent);
+        }
+        return null; //TODO throw exception
     }
 
     public Event unsubscribePlayer(Long eventId, Player playerToUnsubscribe) {
@@ -108,27 +110,28 @@ public class EventsService {
         }
     }
 
-    private List<PlayerScore> calculatePlayersScores(boolean started, List<Player> playersToShuffle) throws Exception{
+    //public because i'm using it in PlayersService for the rankList
+    public List<PlayerScore> calculatePlayersScores(boolean started, List<Player> players) throws Exception{
 
         List<PlayerScore> playersScores= new ArrayList<>();
 
-        List<Player> players = new ArrayList<>(playersToShuffle);
-        Collections.shuffle(players);
+        List<Player> playersShouffled = new ArrayList<>(players);
+        Collections.shuffle(playersShouffled);
         if(started){
-            players.forEach(
+            playersShouffled.forEach(
                     player -> playersScores.add(
                             calculatePastRounds(
                                     PlayerScore
                                             .builder()
                                             .id(player.getId())
-                                            .name(player.getName()) //im using these in the name/surname for the current round in the fe page. doing that here will save memory
+                                            .name(player.getName()) //im using the name/surname for the "current round" in the fe page. doing that here will save memory
                                             .surname(player.getSurname())
                                             .build()
                             )
                     )
             );
         }else{
-            players.forEach(
+            playersShouffled.forEach(
                     player -> playersScores.add(
                             PlayerScore
                                     .builder()

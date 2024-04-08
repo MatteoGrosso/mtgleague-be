@@ -43,6 +43,7 @@ public class RoundService {
     public Long confirmScore(RoundRequestDTO round){
         Round roundToSave= findById(round.getRoundId());
 
+        //only the players playing this match can save the score
         if((round.getPlayerId()==roundToSave.getIdP1() || round.getPlayerId()==roundToSave.getIdP2()) && !roundToSave.isEnded()){
             roundToSave.setP1Wins(round.getP1Wins());
             roundToSave.setP2Wins(round.getP2Wins());

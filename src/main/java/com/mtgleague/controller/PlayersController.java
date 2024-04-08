@@ -3,6 +3,7 @@ package com.mtgleague.controller;
 import com.mtgleague.dto.request.PlayerRequestDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.dto.response.PlayerResponseDTO;
+import com.mtgleague.logic.PlayerScore;
 import com.mtgleague.model.Player;
 import com.mtgleague.service.PlayersService;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,8 @@ public class PlayersController {
     private final PlayersService playersService;
 
     @GetMapping()
-    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayersRanked(){
-        GenericEntityListDTO<PlayerResponseDTO> players= new GenericEntityListDTO(playersService.findAll());
+    public ResponseEntity<GenericEntityListDTO<PlayerScore>> getPlayersRanked() throws Exception {
+        GenericEntityListDTO<PlayerScore> players= new GenericEntityListDTO(playersService.findAll());
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
 

@@ -26,7 +26,9 @@ public class SecurityConfig {
     private static final String[] WHITE_LIST_URL = {
             "/auth/**",
             "/events",
-            "/events/{eventId}"
+            "/events/{eventId}",
+            "/players",
+            "/players/role"
     };
 
     private static final String[] ADMIN_URL = {
