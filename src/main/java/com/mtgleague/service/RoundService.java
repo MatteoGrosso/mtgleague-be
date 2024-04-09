@@ -1,7 +1,6 @@
 package com.mtgleague.service;
 
 import com.mtgleague.dto.request.RoundRequestDTO;
-import com.mtgleague.dto.response.RoundResponseDTO;
 import com.mtgleague.model.Event;
 import com.mtgleague.model.Round;
 import com.mtgleague.repo.RoundRepository;

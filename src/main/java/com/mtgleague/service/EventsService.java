@@ -3,7 +3,6 @@ package com.mtgleague.service;
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.response.EventPlayerResponseDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
-import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.logic.Pairing;
 import com.mtgleague.logic.PlayerScore;
 import com.mtgleague.model.Event;

@@ -2,8 +2,6 @@ package com.mtgleague.dto.response;
 
 import lombok.*;
 
-import java.util.Set;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -1,9 +1,6 @@
 package com.mtgleague.dto.response;
 
-import com.mtgleague.model.Event;
 import lombok.*;
-
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
