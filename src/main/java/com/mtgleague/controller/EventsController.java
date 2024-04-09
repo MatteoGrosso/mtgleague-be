@@ -2,6 +2,7 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.request.PlayerRequestDTO;
+import com.mtgleague.dto.response.EventPlayerResponseDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.model.Event;
@@ -27,6 +28,12 @@ public class EventsController {
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
+    @GetMapping("/{eventId}/players")
+    public ResponseEntity<GenericEntityListDTO<EventPlayerResponseDTO>> getEventRanks(@PathVariable("eventId") Long eventId) throws Exception {
+        GenericEntityListDTO<EventPlayerResponseDTO> players= new GenericEntityListDTO(eventsService.findEventRanks(eventId));
+        return new ResponseEntity<>(players, HttpStatus.OK);
+    }
+
     @GetMapping("/{eventId}")
     public ResponseEntity<EventResponseDTO> findEventById(@PathVariable("eventId") Long eventId){
         EventResponseDTO event= eventsService.findByIdDTO(eventId);
@@ -39,7 +46,7 @@ public class EventsController {
         return new ResponseEntity<>(newEvent, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{eventId}/register")
+    @PostMapping("/{eventId}/register") //TODO un giocatore può iscriversi massimo ad un torneo in un giorno
     public ResponseEntity<Event> registerPlayer(@PathVariable("eventId") Long eventId, @RequestBody PlayerRequestDTO request){
         Player playerToSubscribe= playersService.findById(request.getPlayerId());
         Event updatedEvent= eventsService.registerPlayer(eventId, playerToSubscribe);

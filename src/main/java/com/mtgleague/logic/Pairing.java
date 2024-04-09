@@ -90,12 +90,16 @@ public class Pairing {
                 }
         );
         int numberOfOpponents= player.getOpponentsIds().size();
-        return numberOfOpponents>0 ? omwPlayer.get()/numberOfOpponents : 0;
+        double omw= numberOfOpponents>0 ? omwPlayer.get()/numberOfOpponents : 0;
+        player.setOmw(omw);
+        return omw;
     }
 
     //omw is the value that refers to the winRate (of the single games) of the player
     private double gwCalc(PlayerScore player){
-        return player.getGameWinRateWithoutBye();
+        double gw= player.getGameWinRateWithoutBye();
+        player.setGw(gw);
+        return gw;
     }
 
     //omw is the value that refers to the winRate (of the single games) of the opponents / the number of opponents
@@ -113,7 +117,10 @@ public class Pairing {
                 }
         );
         int numberOfOpponents= player.getOpponentsIds().size();
-        return numberOfOpponents>0 ? ogwPlayer.get()/numberOfOpponents : 0;
+
+        double ogw= numberOfOpponents>0 ? ogwPlayer.get()/numberOfOpponents : 0;
+        player.setOmw(ogw);
+        return ogw;
     }
 
     public void doPairings(List<PlayerScore> players, Event event, int currentTurn){

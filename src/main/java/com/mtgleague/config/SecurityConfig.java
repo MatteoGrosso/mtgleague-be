@@ -27,8 +27,9 @@ public class SecurityConfig {
             "/auth/**",
             "/events",
             "/events/{eventId}",
+            "/events/{eventId}/players",
             "/players",
-            "/players/role"
+            "/players/role",
     };
 
     private static final String[] ADMIN_URL = {

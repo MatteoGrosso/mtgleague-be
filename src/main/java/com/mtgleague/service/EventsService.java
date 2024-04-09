@@ -1,7 +1,9 @@
 package com.mtgleague.service;
 
 import com.mtgleague.dto.request.EventRequestDTO;
+import com.mtgleague.dto.response.EventPlayerResponseDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
+import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.logic.Pairing;
 import com.mtgleague.logic.PlayerScore;
 import com.mtgleague.model.Event;
@@ -79,7 +81,7 @@ public class EventsService {
 
     public void calculatePairings(Long eventId) throws Exception {
         Event event= findById(eventId);
-
+        //TODO controlla che la data sia = a quella odierna
         if(event.getMaxTurn()==0){
             event.setMaxTurn(getMaxTurn(event));
         }
@@ -101,7 +103,7 @@ public class EventsService {
             List<Player> players = new ArrayList<>(event.getPlayers());
             Collections.shuffle(players);
 
-            List<PlayerScore> activePlayers = calculatePlayersScores(eventStarted, players);
+            List<PlayerScore> activePlayers = calculatePlayersScores(eventStarted, players, event.getId());
             if(eventStarted){
                 // Sort the list of active players based on the actual score + the 3-step rules to break a tie
                 pairing.quickSort(activePlayers, 0, activePlayers.size() - 1);
@@ -111,7 +113,7 @@ public class EventsService {
     }
 
     //public because I'm using it in PlayersService for the rankList
-    public List<PlayerScore> calculatePlayersScores(boolean started, List<Player> players) throws Exception{
+    public List<PlayerScore> calculatePlayersScores(boolean started, List<Player> players, Long eventId) throws Exception{
 
         List<PlayerScore> playersScores= new ArrayList<>();
 
@@ -127,6 +129,7 @@ public class EventsService {
                                             .name(player.getName()) //im using the name/surname for the "current round" in the fe page. doing that here will save memory
                                             .surname(player.getSurname())
                                             .build()
+                                    ,eventId
                             )
                     )
             );
@@ -145,9 +148,14 @@ public class EventsService {
         return playersScores;
     }
 
-    private PlayerScore calculatePastRounds(PlayerScore playerScore){
+    private PlayerScore calculatePastRounds(PlayerScore playerScore, Long eventId){
+        List<Round> playerRounds;
+        if(eventId != null){
+            playerRounds= roundService.getAllEventPlayerRounds(playerScore.getId(), eventId);
+        }else{
+            playerRounds= roundService.getAllPlayerRounds(playerScore.getId());
+        }
 
-        List<Round> playerRounds= roundService.getAllPlayerRounds(playerScore.getId());
         Set<Long> opponents = new HashSet<>();
 
         playerRounds.forEach(
@@ -188,5 +196,34 @@ public class EventsService {
         );
         playerScore.setOpponentsIds(opponents);
         return playerScore;
+    }
+
+    public List<EventPlayerResponseDTO> findEventRanks(Long eventId) throws Exception {
+        List<Player> players= eventsRepository.getReferenceById(eventId).getPlayers().stream().toList();
+        List<PlayerScore> playerScores= calculatePlayersScores(true, players, eventId);
+        pairing.quickSort(playerScores, 0, playerScores.size() - 1);
+
+        List<EventPlayerResponseDTO> result= new ArrayList<>();
+        playerScores.forEach(
+                player -> {
+                    player.setEventsPlayed(
+                            players.stream().filter(
+                                    r -> r.getId()==player.getId()
+                            ).collect(Collectors.toList()).get(0).getEvents().size());
+                    result.add(toDto(player));
+                }
+        );
+        return result;
+    }
+
+    private EventPlayerResponseDTO toDto(PlayerScore playerScore){
+        return EventPlayerResponseDTO.builder()
+                .name(playerScore.getName())
+                .surname(playerScore.getSurname())
+                .score(playerScore.getScore())
+                .omw(playerScore.getOmw())
+                .gw(playerScore.getGw())
+                .ogw(playerScore.getOgw())
+                .build();
     }
 }

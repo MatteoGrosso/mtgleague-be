@@ -68,4 +68,8 @@ public class RoundService {
         return roundRepository.findByPlayerId(playerId);
     }
 
+    public List<Round> getAllEventPlayerRounds(Long playerId, Long eventId){
+        return roundRepository.findByPlayerIdAndEventId(playerId, eventId);
+    }
+
 }

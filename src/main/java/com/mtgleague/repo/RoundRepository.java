@@ -15,6 +15,9 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
     @Query("SELECT r FROM Round r WHERE r.idP1 = :playerId OR r.idP2 = :playerId")
     List<Round> findByPlayerId(@Param("playerId") Long playerId);
 
+    @Query("SELECT r FROM Round r WHERE (r.idP1 = :playerId OR r.idP2 = :playerId) AND r.event.id = :eventId")
+    List<Round> findByPlayerIdAndEventId(@Param("playerId") Long playerId, @Param("eventId") Long eventId);
+
     @Query("SELECT r FROM Round r WHERE (r.idP1 = :playerId OR r.idP2 = :playerId) ORDER BY r.turn DESC LIMIT 1")
     Optional<Round> findCurrentByPlayerId(@Param("playerId") Long playerId);
 

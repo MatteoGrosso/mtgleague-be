@@ -25,6 +25,9 @@ public class PlayerScore {
     private int matchDraw;
     private int matchPlayed;
     private int matchPlayedWithoutBye;
+    private double omw;
+    private double gw;
+    private double ogw;
 
     private Set<Long> opponentsIds;
 
@@ -34,10 +37,19 @@ public class PlayerScore {
         return matchWin * 3 + matchDraw;
     }
 
+    public double getOmw(){
+        return Double.parseDouble(String.format("%.2f", omw));
+    }
+    public double getGw(){
+        return Double.parseDouble(String.format("%.2f", gw));
+    }
+    public double getOgw(){
+        return Double.parseDouble(String.format("%.2f", ogw));
+    }
+
     public double getMatchWinRate(){
         double matchWinRate= ((double)matchWin/(double)matchPlayed)*100;
         return Double.parseDouble(String.format("%.2f", matchWinRate));
-
     }
 
     public double getFixedMatchWinRateWithoutBye(){

@@ -21,7 +21,7 @@ public class PlayersService {
 
     public List<PlayerResponseDTO> findAll() throws Exception {
         List<Player> results= playersRepository.findAll();
-        List<PlayerScore> playerScores= eventsService.calculatePlayersScores(true, results);
+        List<PlayerScore> playerScores= eventsService.calculatePlayersScores(true, results, null);
         pairing.quickSort(playerScores, 0, playerScores.size() - 1);
 
         List<PlayerResponseDTO> result= new ArrayList<>();
