@@ -11,13 +11,17 @@ public class RoundResponseDTO {
 
     private Long id;
 
-    private Long idP1;
     private String nameP1;
     private String surnameP1;
 
-    private Long idP2;
     private String nameP2;
     private String surnameP2;
 
-    public boolean ended;
+    private boolean ended;
+    private boolean eventEnded;
+
+    private int p1Wins;
+    private int p2Wins;
+    private boolean bye;
+
 }

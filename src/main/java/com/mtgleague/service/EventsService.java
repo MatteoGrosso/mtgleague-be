@@ -12,6 +12,7 @@ import com.mtgleague.repo.EventsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,16 +80,19 @@ public class EventsService {
     }
 
     public void calculatePairings(Long eventId) throws Exception {
-        Event event= findById(eventId);
-        //TODO controlla che la data sia = a quella odierna
-        if(event.getMaxTurn()==0){
-            event.setMaxTurn(getMaxTurn(event));
-        }
 
-        event.setCurrentTurn(event.getCurrentTurn()+1);
-        calculatePairings(event);
-        event.setStarted(true); //redundant after the first start, but I'll leave it as is
-        eventsRepository.save(event);
+        Event event= findById(eventId);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        if(dateFormat.format(event.getDate()).equals(dateFormat.format(new Date()))){
+            if(event.getMaxTurn()==0){
+                event.setMaxTurn(getMaxTurn(event));
+            }
+            event.setCurrentTurn(event.getCurrentTurn()+1);
+            calculatePairings(event);
+            event.setStarted(true); //redundant after the first start, but I'll leave it as is as it is faster than a condition and I have to save the entity anyway
+            eventsRepository.save(event);
+        }
     }
 
     private int getMaxTurn(Event event){
@@ -97,7 +101,7 @@ public class EventsService {
     }
 
     private void calculatePairings(Event event) throws Exception {
-        if(event.getCurrentTurn()<event.getMaxTurn()){
+        if(event.getCurrentTurn()<=event.getMaxTurn()){
             boolean eventStarted= event.isStarted();
             List<Player> players = new ArrayList<>(event.getPlayers());
             Collections.shuffle(players);
