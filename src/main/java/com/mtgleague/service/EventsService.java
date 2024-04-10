@@ -56,25 +56,31 @@ public class EventsService {
     }
 
     public Event registerPlayer(Long eventId, Player playerToSubscribe) {
+
         Event selectedEvent= findById(eventId);
         Set<Player> playersSubscribed= selectedEvent.getPlayers();
-        if(playersSubscribed.size()<selectedEvent.getCap()){
+
+        if(playersSubscribed.size()<selectedEvent.getCap() && !selectedEvent.isStarted()){
             playersSubscribed.add(playerToSubscribe);
             selectedEvent.setPlayers(playersSubscribed);
             return eventsRepository.save(selectedEvent);
         }
-        return null; //TODO throw exception
+        return null;
     }
 
     public Event unsubscribePlayer(Long eventId, Player playerToUnsubscribe) {
+
         Event selectedEvent= findById(eventId);
-        Set<Player> playersSubscribed= selectedEvent.getPlayers();
 
-        Set<Player> filteredPlayers = playersSubscribed.stream()
-                .filter(player -> player.getId() != playerToUnsubscribe.getId())
-                .collect(Collectors.toSet());
+        if(!selectedEvent.isStarted()){
+            Set<Player> playersSubscribed= selectedEvent.getPlayers();
 
-        selectedEvent.setPlayers(filteredPlayers);
+            Set<Player> filteredPlayers = playersSubscribed.stream()
+                    .filter(player -> player.getId() != playerToUnsubscribe.getId())
+                    .collect(Collectors.toSet());
+
+            selectedEvent.setPlayers(filteredPlayers);
+        }
 
         return eventsRepository.save(selectedEvent);
     }

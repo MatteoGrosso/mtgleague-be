@@ -1,18 +1,14 @@
 package com.mtgleague.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mtgleague.dto.request.RoundRequestDTO;
 import com.mtgleague.dto.response.RoundResponseDTO;
 import com.mtgleague.model.Event;
 import com.mtgleague.model.Round;
 import com.mtgleague.repo.RoundRepository;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
