@@ -1,12 +1,13 @@
 package com.mtgleague.service;
 
 import com.mtgleague.dto.request.EventRequestDTO;
-import com.mtgleague.dto.response.EventPlayerResponseDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
+import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.logic.Pairing;
 import com.mtgleague.logic.PlayerScore;
 import com.mtgleague.model.Event;
 import com.mtgleague.model.Player;
+import com.mtgleague.model.Ranking;
 import com.mtgleague.model.Round;
 import com.mtgleague.repo.EventsRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +25,16 @@ public class EventsService {
 
     private final RoundService roundService;
 
+    private final PlayersService playersService;
+
+    private final RankingService rankingService;
+
     private final Pairing pairing;
 
     public List<EventResponseDTO> findAll(){
-        List<Event> results= eventsRepository.findAll();
+        List<Event> results= eventsRepository.findAllOrdered();
         List<EventResponseDTO> dtos= new ArrayList<>();
-        results.forEach(event -> {
-            dtos.add(toDto(event));
-        });
+        results.forEach(event -> dtos.add(toDto(event)));
         return dtos;
     }
 
@@ -52,7 +55,16 @@ public class EventsService {
     }
 
     private EventResponseDTO toDto(Event entity){
-        return new EventResponseDTO(entity.getId(), entity.getName(), entity.getDate(), entity.getCap(), entity.getDescription(), entity.isStarted(), entity.getPlayers());
+
+        //ordering players base on the name
+        Comparator<Player> nameComparator = Comparator.comparing(Player::getName);
+        Set<Player> players = new TreeSet<>(nameComparator);
+        entity.getPlayers().forEach(
+                player -> players.add(player)
+        );
+
+        return new EventResponseDTO(entity.getId(), entity.getName(), entity.getDate(), entity.getCap(), entity.getDescription(), entity.isStarted(), players
+        );
     }
 
     public Event registerPlayer(Long eventId, Player playerToSubscribe) {
@@ -107,18 +119,66 @@ public class EventsService {
     }
 
     private void calculatePairings(Event event) throws Exception {
+        Long eventId= event.getId();
         if(event.getCurrentTurn()<=event.getMaxTurn()){
             boolean eventStarted= event.isStarted();
             List<Player> players = new ArrayList<>(event.getPlayers());
             Collections.shuffle(players);
 
-            List<PlayerScore> activePlayers = calculatePlayersScores(eventStarted, players, event.getId());
+            List<PlayerScore> activePlayers = calculatePlayersScores(eventStarted, players, eventId);
             if(eventStarted){
                 // Sort the list of active players based on the actual score + the 3-step rules to break a tie
                 pairing.quickSort(activePlayers, 0, activePlayers.size() - 1);
             }
             pairing.doPairings(activePlayers, event, event.getCurrentTurn());
+        } else {
+            rankingService.invalidateRankings();
+
+            //calculate event rank and save in ranking table
+            rankingService.saveRankings(
+                    Ranking.builder()
+                            .eventId(eventId)
+                            .players(rankingCalc(eventId))
+                            .isValid(true)
+                            .build()
+            );
+
+            //calculate general rank and save in ranking table
+            rankingService.saveRankings(
+                    Ranking.builder()
+                            .eventId(null)
+                            .players(rankingCalc(null))
+                            .isValid(true)
+                            .build()
+            );
         }
+    }
+
+    public List<PlayerResponseDTO> rankingCalc(Long eventId) throws Exception {
+        //set eventId "null" to get the global ranking
+
+        List<Player> results= playersService.findAll();
+        List<PlayerScore> playerScores= calculatePlayersScores(true, results, eventId);
+        pairing.quickSort(playerScores, 0, playerScores.size() - 1);
+
+        List<PlayerResponseDTO> result = new ArrayList<>();
+        playerScores.forEach(
+                player -> {
+                    Optional<Player> playerResult = results.stream()
+                            .filter(r -> r.getId().equals(player.getId()))
+                            .findFirst();
+
+                    // Use Optional to handle the absence of results
+                    int eventsPlayed = playerResult
+                            .map(r -> r.getEvents().size())
+                            .orElse(0);
+
+                    player.setEventsPlayed(eventsPlayed);
+                    result.add(toPlayerDto(player));
+                }
+        );
+
+        return result;
     }
 
     //public because I'm using it in PlayersService for the rankList
@@ -207,32 +267,18 @@ public class EventsService {
         return playerScore;
     }
 
-    public List<EventPlayerResponseDTO> findEventRanks(Long eventId) throws Exception {
-        List<Player> players= eventsRepository.getReferenceById(eventId).getPlayers().stream().toList();
-        List<PlayerScore> playerScores= calculatePlayersScores(true, players, eventId);
-        pairing.quickSort(playerScores, 0, playerScores.size() - 1);
-
-        List<EventPlayerResponseDTO> result= new ArrayList<>();
-        playerScores.forEach(
-                player -> {
-                    player.setEventsPlayed(
-                            players.stream().filter(
-                                    r -> r.getId()==player.getId()
-                            ).collect(Collectors.toList()).get(0).getEvents().size());
-                    result.add(toDto(player));
-                }
-        );
-        return result;
-    }
-
-    private EventPlayerResponseDTO toDto(PlayerScore playerScore){
-        return EventPlayerResponseDTO.builder()
-                .name(playerScore.getName())
-                .surname(playerScore.getSurname())
-                .score(playerScore.getScore())
-                .omw(playerScore.getOmw())
-                .gw(playerScore.getGw())
-                .ogw(playerScore.getOgw())
+    private PlayerResponseDTO toPlayerDto(PlayerScore entity){
+        PlayerResponseDTO dto= PlayerResponseDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .surname(entity.getSurname())
+                .matchWinRate(entity.getMatchWinRate())
+                .score(entity.getScore())
+                .eventsPlayed(entity.getEventsPlayed())
+                .omw(entity.getOmw())
+                .gw(entity.getGw())
+                .ogw(entity.getOgw())
                 .build();
+        return dto;
     }
 }

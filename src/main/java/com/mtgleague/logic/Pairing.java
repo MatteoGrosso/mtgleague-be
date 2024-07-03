@@ -140,6 +140,11 @@ public class Pairing {
                 roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, currentTurn, true);
             }
         } else {
+            if (byeIsNeeded){
+                PlayerScore player= notYetPaired.get(notYetPaired.size()-1);
+                roundService.createRound(player.getId(), player.getName(), player.getSurname(), null, null, null, 2, 0, event, currentTurn, true);
+                notYetPaired.remove(player);
+            }
             do {
                 PlayerScore player1= notYetPaired.get(notYetPaired.size()-1);
 
@@ -155,10 +160,6 @@ public class Pairing {
                 notYetPaired.remove(player1);
                 notYetPaired.remove(player2);
             } while(notYetPaired.size() > 1);
-            if (byeIsNeeded){
-                PlayerScore player1= notYetPaired.get(notYetPaired.size()-1);
-                roundService.createRound(player1.getId(), player1.getName(), player1.getSurname(), null, null, null, 2, 0, event, currentTurn, true);
-            }
         }
 
     }

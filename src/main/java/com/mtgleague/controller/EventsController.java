@@ -2,13 +2,14 @@ package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.EventRequestDTO;
 import com.mtgleague.dto.request.PlayerRequestDTO;
-import com.mtgleague.dto.response.EventPlayerResponseDTO;
 import com.mtgleague.dto.response.EventResponseDTO;
 import com.mtgleague.dto.response.GenericEntityListDTO;
+import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.model.Event;
 import com.mtgleague.model.Player;
 import com.mtgleague.service.EventsService;
 import com.mtgleague.service.PlayersService;
+import com.mtgleague.service.RankingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,8 @@ public class EventsController {
     private final EventsService eventsService;
     private final PlayersService playersService;
 
+    private final RankingService rankingService;
+
     @GetMapping()
     public ResponseEntity<GenericEntityListDTO<EventResponseDTO>> getEvents(){
         GenericEntityListDTO<EventResponseDTO> events= new GenericEntityListDTO(eventsService.findAll());
@@ -29,8 +32,8 @@ public class EventsController {
     }
 
     @GetMapping("/{eventId}/players")
-    public ResponseEntity<GenericEntityListDTO<EventPlayerResponseDTO>> getEventRanks(@PathVariable("eventId") Long eventId) throws Exception {
-        GenericEntityListDTO<EventPlayerResponseDTO> players= new GenericEntityListDTO(eventsService.findEventRanks(eventId));
+    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getEventRanks(@PathVariable("eventId") Long eventId) throws Exception {
+        GenericEntityListDTO<PlayerResponseDTO> players= new GenericEntityListDTO(rankingService.getEventRank(eventId));
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
 

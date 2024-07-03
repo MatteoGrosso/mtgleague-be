@@ -1,7 +1,6 @@
 package com.mtgleague.controller;
 
 import com.mtgleague.dto.request.PlayerRequestDTO;
-import com.mtgleague.dto.response.GenericEntityListDTO;
 import com.mtgleague.dto.response.PlayerResponseDTO;
 import com.mtgleague.model.Player;
 import com.mtgleague.service.PlayersService;
@@ -16,12 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class PlayersController {
 
     private final PlayersService playersService;
-
-    @GetMapping()
-    public ResponseEntity<GenericEntityListDTO<PlayerResponseDTO>> getPlayersRanked() throws Exception {
-        GenericEntityListDTO<PlayerResponseDTO> players= new GenericEntityListDTO(playersService.findAll());
-        return new ResponseEntity<>(players, HttpStatus.OK);
-    }
 
     @PostMapping("/role")
     public ResponseEntity<PlayerResponseDTO> getPlayerRole(@RequestBody PlayerRequestDTO playerRequestDTO) {
